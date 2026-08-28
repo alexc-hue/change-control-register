@@ -1,0 +1,15 @@
+change_id,description,category,cost_impact,schedule_impact_days,date_raised,status,date_decided
+CC01,Upgrade control valve spec per client standard,Client Request,12000,5,2026-01-20,Approved,2026-01-28
+CC02,Additional soil remediation scope,Environmental,38000,12,2026-02-05,Approved,2026-02-25
+CC03,Remove redundant instrumentation loop,Scope,-9000,0,2026-02-18,Approved,2026-02-22
+CC04,Vendor-proposed alternative compressor skid layout,Design,21000,7,2026-03-01,Rejected,2026-03-15
+CC05,Regulatory update to noise abatement requirement,Regulatory,26000,6,2026-03-10,Approved,2026-04-02
+CC06,Client request for additional SCADA reporting tags,Client Request,8000,2,2026-03-22,Approved,2026-03-29
+CC07,Site access road realignment due to third-party utility conflict,Site,31000,15,2026-04-05,Approved,2026-05-10
+CC08,Cable sizing revision following updated load calculation,Design,6000,0,2026-04-18,Approved,2026-04-24
+CC09,Contractor claim for extended standby,Commercial,19000,0,2026-05-02,Pending,
+CC10,Additional fire and gas detection coverage,Regulatory,24000,8,2026-05-15,Approved,2026-06-20
+CC11,Value engineering: alternate cable tray material,Scope,-14000,0,2026-05-28,Approved,2026-06-03
+CC12,Client-requested commissioning schedule compression,Client Request,17000,-10,2026-06-10,Approved,2026-06-18
+CC13,Additional structural steel due to updated wind loading,Design,29000,9,2026-06-25,Pending,
+CC14,Extended warranty period requested by client,Commercial,5000,0,2026-07-08,Rejected,2026-07-20
