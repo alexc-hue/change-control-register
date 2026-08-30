@@ -10,7 +10,8 @@ Part of a small project-controls toolkit:
 [project-controls-dashboard](https://github.com/alexc-hue/project-controls-dashboard),
 [schedule-health-analyzer](https://github.com/alexc-hue/schedule-health-analyzer),
 **change-control-register** (this repo),
-[risk-trend-tracker](https://github.com/alexc-hue/risk-trend-tracker).
+[risk-trend-tracker](https://github.com/alexc-hue/risk-trend-tracker),
+[project-controls-reporting-engine](https://github.com/alexc-hue/project-controls-reporting-engine).
 
 ![Cumulative cost](assets/cumulative_cost.png)
 
