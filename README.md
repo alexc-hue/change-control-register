@@ -12,6 +12,8 @@ Part of a small project-controls toolkit:
 **change-control-register** (this repo),
 [risk-trend-tracker](https://github.com/alexc-hue/risk-trend-tracker).
 
+![Cumulative cost](assets/cumulative_cost.png)
+
 ## Problem
 
 A change register usually gets reviewed as a point-in-time list: here are
@@ -24,7 +26,9 @@ limbo for months while cost and schedule exposure sits unresolved.
 ## Approach
 
 - Track every change with its raised date, decision date (if decided), cost
-  and schedule impact, and status (Approved / Rejected / Pending).
+  and schedule impact, and status (Approved / Rejected / Pending), the same
+  fields PMI's Integrated Change Control process area expects a change
+  register to carry.
 - For decided changes, compute the decision cycle time (days from raised to
   decided). For pending ones, compute days open against a status date, and
   flag anything open longer than a stale threshold (30 days by default).
