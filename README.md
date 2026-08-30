@@ -103,6 +103,10 @@ would make the report less actionable, not more.
 - Cumulative impact is ordered by decision date, not by when the underlying
   cost was actually incurred, appropriate for tracking baseline drift, not
   a substitute for actual cost-to-date reporting.
+- The approve/reject decision itself is a given input, not something the
+  tool evaluates or recommends, that authority stays with whoever the
+  client's governance structure assigns it to. Meant to sit alongside a
+  contract/commercial management system as the log, not replace it.
 
 ## Run it
 
