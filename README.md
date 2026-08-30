@@ -1,9 +1,10 @@
 # Change Control Register
 
-A Python tool that tracks a project's change log over time and answers the
-questions a single change-register snapshot can't: how much has the budget
-actually crept as changes get approved, how long is it taking to decide on
-them, and which pending changes have been sitting undecided too long.
+Operationalizes change control as an ongoing process, not a point-in-time
+list. Tracks a project's change log over time and answers what a single
+snapshot can't: how much has the budget actually crept as changes get
+approved, how long decisions are taking, and which pending changes have been
+sitting undecided too long.
 
 Part of a small project-controls toolkit:
 [project-controls-dashboard](https://github.com/alexc-hue/project-controls-dashboard),
@@ -42,10 +43,11 @@ The sample data is a fictional 14-change log on a compressor station
 upgrade over about six months, with a mix of fast and slow approvals, two
 rejected changes, and two changes still pending, one of them stale.
 
-## Technology
+## Implementation
 
-Python, pandas for the cycle-time and cumulative-sum logic, matplotlib for
-the charts.
+Built in Python so change-log tracking doesn't depend on a spreadsheet
+formula surviving the next edit: pandas for the cycle-time and
+cumulative-sum logic, matplotlib for the charts.
 
 ## Result
 
