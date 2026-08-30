@@ -5,6 +5,12 @@ questions a single change-register snapshot can't: how much has the budget
 actually crept as changes get approved, how long is it taking to decide on
 them, and which pending changes have been sitting undecided too long.
 
+Part of a small project-controls toolkit:
+[project-controls-dashboard](https://github.com/alexc-hue/project-controls-dashboard),
+[schedule-health-analyzer](https://github.com/alexc-hue/schedule-health-analyzer),
+**change-control-register** (this repo),
+[risk-trend-tracker](https://github.com/alexc-hue/risk-trend-tracker).
+
 ## Problem
 
 A change register usually gets reviewed as a point-in-time list: here are
