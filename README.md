@@ -80,8 +80,8 @@ were decided.
 
 ![Cumulative cost](assets/cumulative_cost.png)
 
-**Decision cycle time** — days to decide for resolved changes (blue), days
-open for pending ones (orange, red if stale).
+**Decision cycle time** — days to decide for resolved changes (green), days
+open for pending ones (amber, red if stale).
 
 ![Cycle time](assets/cycle_time.png)
 

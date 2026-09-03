@@ -21,6 +21,33 @@ ASSETS_DIR = os.path.join(os.path.dirname(__file__), "assets")
 
 STATUS_DATE = "2026-08-01"
 
+# Standardized chart color system (chart chrome, status scale, categorical series, baseline)
+CHART_BG = "#fcfcfb"
+INK = "#10182b"
+GRID = "#e1e0d9"
+BASELINE = "#3a4d7a"
+SERIES_1 = "#2a78d6"
+STATUS_GOOD = "#0ca30c"
+STATUS_WARNING = "#fab219"
+STATUS_CRITICAL = "#d03b3b"
+
+
+def _apply_chrome(fig, axes) -> None:
+    """Apply the standardized chart chrome (background, ink, gridlines) to a figure."""
+    fig.patch.set_facecolor(CHART_BG)
+    if hasattr(axes, "flatten"):
+        axes = axes.flatten().tolist()
+    elif not isinstance(axes, (list, tuple)):
+        axes = [axes]
+    for ax in axes:
+        ax.set_facecolor(CHART_BG)
+        ax.title.set_color(INK)
+        ax.xaxis.label.set_color(INK)
+        ax.yaxis.label.set_color(INK)
+        ax.tick_params(colors=INK)
+        for spine in ax.spines.values():
+            spine.set_color(INK)
+
 
 def money(x: float) -> str:
     return f"${x:,.0f}"
@@ -62,15 +89,16 @@ def print_report(changes, cum, stats: dict) -> None:
 def chart_cumulative(cum, value_col: str, ylabel: str, title: str, filename: str) -> None:
     fig, ax = plt.subplots(figsize=(9, 5))
     ax.step(cum["date_decided"].to_numpy(), cum[value_col].to_numpy(), where="post",
-            color="#4C72B0", linewidth=2)
-    ax.scatter(cum["date_decided"].to_numpy(), cum[value_col].to_numpy(), color="#4C72B0", s=20, zorder=3)
-    ax.axhline(0, color="gray", linewidth=0.8)
+            color=SERIES_1, linewidth=2)
+    ax.scatter(cum["date_decided"].to_numpy(), cum[value_col].to_numpy(), color=SERIES_1, s=20, zorder=3)
+    ax.axhline(0, color=INK, linewidth=0.8, alpha=0.6)
     ax.set_ylabel(ylabel)
     ax.set_title(title)
-    ax.grid(alpha=0.3)
+    ax.grid(color=GRID, linewidth=0.6)
+    _apply_chrome(fig, ax)
     fig.autofmt_xdate()
     fig.tight_layout()
-    fig.savefig(os.path.join(ASSETS_DIR, filename), dpi=140)
+    fig.savefig(os.path.join(ASSETS_DIR, filename), dpi=140, facecolor=CHART_BG)
     plt.close(fig)
 
 
@@ -81,19 +109,20 @@ def chart_cycle_time(changes) -> None:
         labels.append(f"{row['change_id']} ({row['status']})")
         if row["status"] == "Pending":
             values.append(row["days_open"])
-            colors.append("#C44E52" if row["is_stale"] else "#DD8452")
+            colors.append(STATUS_CRITICAL if row["is_stale"] else STATUS_WARNING)
         else:
             values.append(row["cycle_days"])
-            colors.append("#4C72B0")
+            colors.append(STATUS_GOOD)
     ax.barh(labels, values, color=colors)
-    ax.axvline(metrics.STALE_PENDING_DAYS, color="gray", linestyle="--", linewidth=1,
+    ax.axvline(metrics.STALE_PENDING_DAYS, color=BASELINE, linestyle="--", linewidth=1,
                label=f"Stale threshold ({metrics.STALE_PENDING_DAYS}d)")
     ax.set_xlabel("Days")
-    ax.set_title("Decision Cycle Time (blue = decided) / Days Open (orange/red = pending)")
+    ax.set_title("Decision Cycle Time (green = decided) / Days Open (amber/red = pending)")
     ax.legend(fontsize=8)
-    ax.grid(alpha=0.3, axis="x")
+    ax.grid(color=GRID, linewidth=0.6, axis="x")
+    _apply_chrome(fig, ax)
     fig.tight_layout()
-    fig.savefig(os.path.join(ASSETS_DIR, "cycle_time.png"), dpi=140)
+    fig.savefig(os.path.join(ASSETS_DIR, "cycle_time.png"), dpi=140, facecolor=CHART_BG)
     plt.close(fig)
 
 
