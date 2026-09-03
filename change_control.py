@@ -114,11 +114,19 @@ def chart_cycle_time(changes) -> None:
             values.append(row["cycle_days"])
             colors.append(STATUS_GOOD)
     ax.barh(labels, values, color=colors)
-    ax.axvline(metrics.STALE_PENDING_DAYS, color=BASELINE, linestyle="--", linewidth=1,
-               label=f"Stale threshold ({metrics.STALE_PENDING_DAYS}d)")
+    threshold_line = ax.axvline(
+        metrics.STALE_PENDING_DAYS, color=BASELINE, linestyle="--", linewidth=1,
+        label=f"Stale threshold ({metrics.STALE_PENDING_DAYS}d)",
+    )
     ax.set_xlabel("Days")
-    ax.set_title("Decision Cycle Time (green = decided) / Days Open (amber/red = pending)")
-    ax.legend(fontsize=8)
+    ax.set_title("Decision Cycle Time / Days Open")
+    handles = [
+        plt.Rectangle((0, 0), 1, 1, color=STATUS_GOOD, label="Decided"),
+        plt.Rectangle((0, 0), 1, 1, color=STATUS_WARNING, label="Pending"),
+        plt.Rectangle((0, 0), 1, 1, color=STATUS_CRITICAL, label="Pending, stale"),
+        threshold_line,
+    ]
+    ax.legend(handles=handles, fontsize=8)
     ax.grid(color=GRID, linewidth=0.6, axis="x")
     _apply_chrome(fig, ax)
     fig.tight_layout()
