@@ -13,6 +13,7 @@ Run:
 import os
 
 import matplotlib.pyplot as plt
+import pandas as pd
 
 from src import metrics
 
@@ -50,7 +51,22 @@ def _apply_chrome(fig, axes) -> None:
 
 
 def money(x: float) -> str:
-    return f"${x:,.0f}"
+    sign = "-" if x < 0 else ""
+    return f"{sign}${abs(x):,.0f}"
+
+
+def timing_str(row, stale_marker: str = "[STALE]") -> str:
+    """Human-readable timing for one change log row.
+
+    Shared by the console report and the markdown writer so the
+    pending/stale-marker logic only lives in one place. `stale_marker` lets
+    each caller use its own formatting (plain text vs. markdown bold).
+    """
+    if row["status"] == "Pending":
+        return f"open {int(row['days_open'])}d" + (f" {stale_marker}" if row["is_stale"] else "")
+    if pd.notna(row["cycle_days"]):
+        return f"decided in {int(row['cycle_days'])}d"
+    return "decided in N/A"
 
 
 def print_report(changes, cum, stats: dict) -> None:
@@ -77,10 +93,7 @@ def print_report(changes, cum, stats: dict) -> None:
     print("CHANGE LOG")
     print("-" * 64)
     for _, row in changes.iterrows():
-        if row["status"] == "Pending":
-            timing = f"open {int(row['days_open'])}d" + (" [STALE]" if row["is_stale"] else "")
-        else:
-            timing = f"decided in {int(row['cycle_days'])}d"
+        timing = timing_str(row, stale_marker="[STALE]")
         print(f"  {row['change_id']:<5} {money(row['cost_impact']):>10}  "
               f"{row['schedule_impact_days']:+3d}d  ({row['category']}, {row['status']})  "
               f"{timing}  {row['description']}")
@@ -156,10 +169,7 @@ def write_report_markdown(changes, cum, stats: dict) -> None:
         "|---|---|---|---|---|---|---|",
     ]
     for _, row in changes.iterrows():
-        if row["status"] == "Pending":
-            timing = f"open {int(row['days_open'])}d" + (" **STALE**" if row["is_stale"] else "")
-        else:
-            timing = f"decided in {int(row['cycle_days'])}d"
+        timing = timing_str(row, stale_marker="**STALE**")
         lines.append(
             f"| {row['change_id']} | {money(row['cost_impact'])} | {row['schedule_impact_days']:+d}d "
             f"| {row['category']} | {row['status']} | {timing} | {row['description']} |"

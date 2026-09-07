@@ -46,7 +46,7 @@ reports clear descriptive metrics and flags instead.
 
 The sample data is a fictional 14-change log on a compressor station
 upgrade over about six months, with a mix of fast and slow approvals, two
-rejected changes, and two changes still pending, one of them stale.
+rejected changes, and two changes still pending, both of them stale.
 
 ## Implementation
 
