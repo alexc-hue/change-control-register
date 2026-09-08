@@ -15,39 +15,12 @@ import os
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from src import metrics
+from src import chart_style, metrics
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
 ASSETS_DIR = os.path.join(os.path.dirname(__file__), "assets")
 
 STATUS_DATE = "2026-08-01"
-
-# Standardized chart color system (chart chrome, status scale, categorical series, baseline)
-CHART_BG = "#fcfcfb"
-INK = "#10182b"
-GRID = "#e1e0d9"
-BASELINE = "#3a4d7a"
-SERIES_1 = "#2a78d6"
-STATUS_GOOD = "#0ca30c"
-STATUS_WARNING = "#fab219"
-STATUS_CRITICAL = "#d03b3b"
-
-
-def _apply_chrome(fig, axes) -> None:
-    """Apply the standardized chart chrome (background, ink, gridlines) to a figure."""
-    fig.patch.set_facecolor(CHART_BG)
-    if hasattr(axes, "flatten"):
-        axes = axes.flatten().tolist()
-    elif not isinstance(axes, (list, tuple)):
-        axes = [axes]
-    for ax in axes:
-        ax.set_facecolor(CHART_BG)
-        ax.title.set_color(INK)
-        ax.xaxis.label.set_color(INK)
-        ax.yaxis.label.set_color(INK)
-        ax.tick_params(colors=INK)
-        for spine in ax.spines.values():
-            spine.set_color(INK)
 
 
 def money(x: float) -> str:
@@ -69,7 +42,7 @@ def timing_str(row, stale_marker: str = "[STALE]") -> str:
     return "decided in N/A"
 
 
-def print_report(changes, cum, stats: dict) -> None:
+def print_report(changes, stats: dict) -> None:
     print("=" * 64)
     print("CHANGE CONTROL REPORT")
     print("=" * 64)
@@ -102,16 +75,16 @@ def print_report(changes, cum, stats: dict) -> None:
 def chart_cumulative(cum, value_col: str, ylabel: str, title: str, filename: str) -> None:
     fig, ax = plt.subplots(figsize=(9, 5))
     ax.step(cum["date_decided"].to_numpy(), cum[value_col].to_numpy(), where="post",
-            color=SERIES_1, linewidth=2)
-    ax.scatter(cum["date_decided"].to_numpy(), cum[value_col].to_numpy(), color=SERIES_1, s=20, zorder=3)
-    ax.axhline(0, color=INK, linewidth=0.8, alpha=0.6)
+            color=chart_style.SERIES_1, linewidth=2)
+    ax.scatter(cum["date_decided"].to_numpy(), cum[value_col].to_numpy(), color=chart_style.SERIES_1, s=20, zorder=3)
+    ax.axhline(0, color=chart_style.INK, linewidth=0.8, alpha=0.6)
     ax.set_ylabel(ylabel)
     ax.set_title(title)
-    ax.grid(color=GRID, linewidth=0.6)
-    _apply_chrome(fig, ax)
+    ax.grid(color=chart_style.GRID, linewidth=0.6)
+    chart_style.apply_chrome(fig, ax)
     fig.autofmt_xdate()
     fig.tight_layout()
-    fig.savefig(os.path.join(ASSETS_DIR, filename), dpi=140, facecolor=CHART_BG)
+    fig.savefig(os.path.join(ASSETS_DIR, filename), dpi=140, facecolor=chart_style.CHART_BG)
     plt.close(fig)
 
 
@@ -122,32 +95,32 @@ def chart_cycle_time(changes) -> None:
         labels.append(f"{row['change_id']} ({row['status']})")
         if row["status"] == "Pending":
             values.append(row["days_open"])
-            colors.append(STATUS_CRITICAL if row["is_stale"] else STATUS_WARNING)
+            colors.append(chart_style.STATUS_CRITICAL if row["is_stale"] else chart_style.STATUS_WARNING)
         else:
             values.append(row["cycle_days"])
-            colors.append(STATUS_GOOD)
+            colors.append(chart_style.STATUS_GOOD)
     ax.barh(labels, values, color=colors)
     threshold_line = ax.axvline(
-        metrics.STALE_PENDING_DAYS, color=BASELINE, linestyle="--", linewidth=1,
+        metrics.STALE_PENDING_DAYS, color=chart_style.BASELINE, linestyle="--", linewidth=1,
         label=f"Stale threshold ({metrics.STALE_PENDING_DAYS}d)",
     )
     ax.set_xlabel("Days")
     ax.set_title("Decision Cycle Time / Days Open")
     handles = [
-        plt.Rectangle((0, 0), 1, 1, color=STATUS_GOOD, label="Decided"),
-        plt.Rectangle((0, 0), 1, 1, color=STATUS_WARNING, label="Pending"),
-        plt.Rectangle((0, 0), 1, 1, color=STATUS_CRITICAL, label="Pending, stale"),
+        plt.Rectangle((0, 0), 1, 1, color=chart_style.STATUS_GOOD, label="Decided"),
+        plt.Rectangle((0, 0), 1, 1, color=chart_style.STATUS_WARNING, label="Pending"),
+        plt.Rectangle((0, 0), 1, 1, color=chart_style.STATUS_CRITICAL, label="Pending, stale"),
         threshold_line,
     ]
     ax.legend(handles=handles, fontsize=8)
-    ax.grid(color=GRID, linewidth=0.6, axis="x")
-    _apply_chrome(fig, ax)
+    ax.grid(color=chart_style.GRID, linewidth=0.6, axis="x")
+    chart_style.apply_chrome(fig, ax)
     fig.tight_layout()
-    fig.savefig(os.path.join(ASSETS_DIR, "cycle_time.png"), dpi=140, facecolor=CHART_BG)
+    fig.savefig(os.path.join(ASSETS_DIR, "cycle_time.png"), dpi=140, facecolor=chart_style.CHART_BG)
     plt.close(fig)
 
 
-def write_report_markdown(changes, cum, stats: dict) -> None:
+def write_report_markdown(changes, stats: dict) -> None:
     lines = [
         "# Change Control Report",
         "",
@@ -188,14 +161,14 @@ def main() -> None:
     cum = metrics.cumulative_impact(changes)
     stats = metrics.summary_stats(changes)
 
-    print_report(changes, cum, stats)
+    print_report(changes, stats)
 
     chart_cumulative(cum, "cum_cost", "Cumulative approved cost impact ($)",
                       "Budget Creep: Cumulative Approved Cost Impact", "cumulative_cost.png")
     chart_cumulative(cum, "cum_schedule_days", "Cumulative approved schedule impact (days)",
                       "Schedule Creep: Cumulative Approved Schedule Impact", "cumulative_schedule.png")
     chart_cycle_time(changes)
-    write_report_markdown(changes, cum, stats)
+    write_report_markdown(changes, stats)
 
     print()
     print("-" * 64)
