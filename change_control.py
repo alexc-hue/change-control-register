@@ -16,16 +16,12 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 from src import chart_style, metrics
+from src.formatting import money
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
 ASSETS_DIR = os.path.join(os.path.dirname(__file__), "assets")
 
 STATUS_DATE = "2026-08-01"
-
-
-def money(x: float) -> str:
-    sign = "-" if x < 0 else ""
-    return f"{sign}${abs(x):,.0f}"
 
 
 def timing_str(row, stale_marker: str = "[STALE]") -> str:
