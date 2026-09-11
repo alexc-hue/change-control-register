@@ -1,5 +1,7 @@
 # Change Control Register
 
+![CI](https://github.com/alexc-hue/change-control-register/actions/workflows/tests.yml/badge.svg)
+
 Operationalizes change control as an ongoing process, not a point-in-time
 list. Tracks a project's change log over time and answers what a single
 snapshot can't: how much has the budget actually crept as changes get
