@@ -30,7 +30,7 @@ def add_cycle_and_aging(changes: pd.DataFrame, status_date: str) -> pd.DataFrame
     df = changes.copy()
     status_dt = pd.Timestamp(status_date)
 
-    # See _is_decided() below: a change is "decided" when it has an actual
+    # See _is_decided() above: a change is "decided" when it has an actual
     # decision date, not merely whenever its status isn't "Pending" (which
     # would also catch e.g. "Cancelled"/"On Hold" and leave cycle_days as NaN
     # for those rows).
@@ -60,7 +60,16 @@ def summary_stats(changes: pd.DataFrame) -> dict:
     # Same _is_decided() definition used in add_cycle_and_aging.
     decided = changes[_is_decided(changes)]
 
-    approval_rate = len(approved) / len(decided) * 100 if len(decided) else float("nan")
+    # approval_rate_pct's numerator has to be a subset of its denominator (both
+    # "decided"), or an "Approved" row with no decision date would count in
+    # the numerator without ever counting in "decided", pushing the rate past
+    # 100%. Surfaced separately too, since an approved change missing its
+    # decision date is itself a data-quality issue worth flagging, not just
+    # something to quietly work around.
+    approved_decided = approved[_is_decided(approved)]
+    approved_missing_decision_date = len(approved) - len(approved_decided)
+
+    approval_rate = len(approved_decided) / len(decided) * 100 if len(decided) else float("nan")
     cycle_values = decided["cycle_days"].dropna().astype(float)
     avg_cycle_days = cycle_values.mean() if len(cycle_values) else float("nan")
 
@@ -70,6 +79,7 @@ def summary_stats(changes: pd.DataFrame) -> dict:
         "rejected_count": len(rejected),
         "pending_count": len(pending),
         "stale_pending_count": int(changes["is_stale"].sum()),
+        "approved_missing_decision_date": approved_missing_decision_date,
         "approval_rate_pct": round(approval_rate, 1) if pd.notna(approval_rate) else None,
         "avg_cycle_days": round(avg_cycle_days, 1) if pd.notna(avg_cycle_days) else None,
         "approved_cost_impact": approved["cost_impact"].sum(),

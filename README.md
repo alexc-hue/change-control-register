@@ -117,4 +117,6 @@ python change_control.py
 ```
 
 Swap in your own `data/change_log.csv` (same columns) to point it at a real
-change register.
+change register. The `STATUS_DATE` constant near the top of
+`change_control.py` is this fictional register's own reporting cutoff too,
+not read from the CSV, so update it by hand as well.

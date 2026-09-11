@@ -21,6 +21,9 @@ from src.formatting import money
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
 ASSETS_DIR = os.path.join(os.path.dirname(__file__), "assets")
 
+# Edit this to match your own project -- see README ("point this at your own
+# data"). It isn't read from the CSV: STATUS_DATE is this fictional change
+# log's own reporting cutoff.
 STATUS_DATE = "2026-08-01"
 
 
@@ -51,6 +54,9 @@ def print_report(changes, stats: dict) -> None:
     avg_cycle = stats["avg_cycle_days"]
     print(f"Average decision cycle time: {avg_cycle if avg_cycle is not None else 'n/a'} days")
     print(f"Stale pending changes (open > {metrics.STALE_PENDING_DAYS}d): {stats['stale_pending_count']}")
+    if stats["approved_missing_decision_date"]:
+        print(f"Data quality: {stats['approved_missing_decision_date']} Approved change(s) "
+              f"missing a decision date, excluded from the approval rate above")
     print()
     print(f"Approved cost impact:     {money(stats['approved_cost_impact'])}")
     print(f"Approved schedule impact: {stats['approved_schedule_days']:+d} days")
@@ -116,16 +122,38 @@ def chart_cycle_time(changes) -> None:
     plt.close(fig)
 
 
+def _escape_md_cell(value) -> str:
+    """Escape/normalize a free-text value so it can't corrupt a markdown table.
+
+    A raw `|` splits into extra columns, a backslash can escape the delimiter
+    that follows it, and embedded newlines break the row onto multiple lines.
+    """
+    if value is None or value != value:  # covers None and NaN (NaN != NaN)
+        return ""
+    text = str(value)
+    text = text.replace("\\", "\\\\").replace("|", "\\|")
+    return text.replace("\r\n", " ").replace("\n", " ").replace("\r", " ")
+
+
 def write_report_markdown(changes, stats: dict) -> None:
+    approval_rate = stats["approval_rate_pct"]
+    avg_cycle = stats["avg_cycle_days"]
     lines = [
         "# Change Control Report",
         "",
         f"**Total changes logged:** {stats['total_changes']} "
         f"(Approved {stats['approved_count']}, Rejected {stats['rejected_count']}, "
         f"Pending {stats['pending_count']})  ",
-        f"**Approval rate:** {stats['approval_rate_pct']}%  ",
-        f"**Average decision cycle time:** {stats['avg_cycle_days']} days  ",
+        f"**Approval rate:** {approval_rate if approval_rate is not None else 'n/a'}%  ",
+        f"**Average decision cycle time:** {avg_cycle if avg_cycle is not None else 'n/a'} days  ",
         f"**Stale pending changes (open > {metrics.STALE_PENDING_DAYS}d):** {stats['stale_pending_count']}",
+    ]
+    if stats["approved_missing_decision_date"]:
+        lines.append(
+            f"**Data quality:** {stats['approved_missing_decision_date']} Approved change(s) missing a "
+            f"decision date, excluded from the approval rate above"
+        )
+    lines += [
         "",
         f"**Approved cost impact:** {money(stats['approved_cost_impact'])}  ",
         f"**Approved schedule impact:** {stats['approved_schedule_days']:+d} days  ",
@@ -141,7 +169,8 @@ def write_report_markdown(changes, stats: dict) -> None:
         timing = timing_str(row, stale_marker="**STALE**")
         lines.append(
             f"| {row['change_id']} | {money(row['cost_impact'])} | {row['schedule_impact_days']:+d}d "
-            f"| {row['category']} | {row['status']} | {timing} | {row['description']} |"
+            f"| {_escape_md_cell(row['category'])} | {row['status']} | {timing} "
+            f"| {_escape_md_cell(row['description'])} |"
         )
     lines.append("")
 
