@@ -1,6 +1,6 @@
 # Change Control Register
 
-![CI](https://github.com/alexc-hue/change-control-register/actions/workflows/tests.yml/badge.svg)
+![CI](https://github.com/alexc-hue/change-control-register/actions/workflows/tests.yml/badge.svg) [![codecov](https://codecov.io/gh/alexc-hue/change-control-register/graph/badge.svg)](https://codecov.io/gh/alexc-hue/change-control-register) [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) ![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)
 
 Operationalizes change control as an ongoing process, not a point-in-time
 list. Tracks a project's change log over time and answers what a single
