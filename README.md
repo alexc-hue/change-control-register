@@ -72,6 +72,8 @@ Pending cost exposure:    $48,000
 Pending schedule exposure: +9 days
 ```
 
+This block is checked in CI against what the script actually prints (see `tests/test_readme_result.py`), so it can't quietly fall out of date.
+
 A saved copy of this report, including the full change log, is generated
 alongside the charts: see [assets/report.md](assets/report.md).
 
