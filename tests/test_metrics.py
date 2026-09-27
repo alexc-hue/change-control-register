@@ -7,8 +7,6 @@ that's the bug summary_stats' approval_rate_pct fix addresses.
 
 from __future__ import annotations
 
-import math
-
 import pandas as pd
 import pytest
 
