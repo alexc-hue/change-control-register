@@ -112,6 +112,11 @@ would make the report less actionable, not more.
   tool evaluates or recommends, that authority stays with whoever the
   client's governance structure assigns it to. Meant to sit alongside a
   contract/commercial management system as the log, not replace it.
+- Size-tested with `benchmarks/size_test.py` on a 2018 laptop (Intel
+  i7-8750H, Python 3.14), single runs, so treat the numbers as a guide:
+  1,000 changes run end to end in about 2 seconds, 10,000 in about 4 and
+  100,000 in under 30. The cycle-time chart shows the 30 changes that waited
+  longest; the console report and report.md list every change.
 
 ## Run it
 
