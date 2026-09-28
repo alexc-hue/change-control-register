@@ -90,24 +90,46 @@ def chart_cumulative(cum, value_col: str, ylabel: str, title: str, filename: str
     plt.close(fig)
 
 
+# The cycle-time chart shows at most this many changes. Past a few dozen
+# bars the labels are unreadable, and drawing thousands of them is what made
+# large change logs slow. Every change is still listed in the console
+# report and assets/report.md.
+CHART_TOP_N = 30
+
+
+def _cycle_time_rows(changes):
+    """Changes in raised order, each with the days it took (or has been open),
+    capped to the CHART_TOP_N longest."""
+    rows = changes.sort_values("date_raised").copy()
+    pending = rows["status"] == "Pending"
+    rows["chart_days"] = rows["days_open"].where(pending, rows["cycle_days"])
+    if len(rows) > CHART_TOP_N:
+        keep = rows["chart_days"].astype(float).sort_values(
+            ascending=False, kind="stable", na_position="last").index[:CHART_TOP_N]
+        rows = rows.loc[rows.index.isin(keep)]
+    return rows
+
+
 def chart_cycle_time(changes) -> None:
     fig, ax = plt.subplots(figsize=(9, 6))
-    labels, values, colors = [], [], []
-    for _, row in changes.sort_values("date_raised").iterrows():
-        labels.append(f"{row['change_id']} ({row['status']})")
-        if row["status"] == "Pending":
-            values.append(row["days_open"])
-            colors.append(chart_style.STATUS_CRITICAL if row["is_stale"] else chart_style.STATUS_WARNING)
-        else:
-            values.append(row["cycle_days"])
-            colors.append(chart_style.STATUS_GOOD)
+    rows = _cycle_time_rows(changes)
+    labels = (rows["change_id"] + " (" + rows["status"] + ")").tolist()
+    values = rows["chart_days"].tolist()
+    colors = [
+        (chart_style.STATUS_CRITICAL if stale else chart_style.STATUS_WARNING) if status == "Pending"
+        else chart_style.STATUS_GOOD
+        for status, stale in zip(rows["status"], rows["is_stale"])
+    ]
     ax.barh(labels, values, color=colors)
     threshold_line = ax.axvline(
         metrics.STALE_PENDING_DAYS, color=chart_style.BASELINE, linestyle="--", linewidth=1,
         label=f"Stale threshold ({metrics.STALE_PENDING_DAYS}d)",
     )
     ax.set_xlabel("Days")
-    ax.set_title("Decision Cycle Time / Days Open")
+    title = "Decision Cycle Time / Days Open"
+    if len(rows) < len(changes):
+        title += f" ({len(rows)} longest of {len(changes)} changes)"
+    ax.set_title(title)
     handles = [
         plt.Rectangle((0, 0), 1, 1, color=chart_style.STATUS_GOOD, label="Decided"),
         plt.Rectangle((0, 0), 1, 1, color=chart_style.STATUS_WARNING, label="Pending"),
