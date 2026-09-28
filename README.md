@@ -124,3 +124,8 @@ Swap in your own `data/change_log.csv` (same columns) to point it at a real
 change register. The `STATUS_DATE` constant near the top of
 `change_control.py` is this fictional register's own reporting cutoff too,
 not read from the CSV, so update it by hand as well.
+
+To see how it copes with bigger generated change logs, run `python
+benchmarks/size_test.py`. It prints run time and peak memory at each size.
+It's a hand-run check, not part of the test suite; measured numbers are
+under Limitations.
