@@ -8,12 +8,17 @@ snapshot can't: how much has the budget actually crept as changes get
 approved, how long decisions are taking, and which pending changes have been
 sitting undecided too long.
 
-Part of a small project-controls toolkit:
+The project-controls toolkit is six tools:
 [project-controls-dashboard](https://github.com/alexc-hue/project-controls-dashboard),
 [schedule-health-analyzer](https://github.com/alexc-hue/schedule-health-analyzer),
 **change-control-register** (this repo),
 [risk-trend-tracker](https://github.com/alexc-hue/risk-trend-tracker),
-[project-controls-reporting-engine](https://github.com/alexc-hue/project-controls-reporting-engine).
+[project-controls-reporting-engine](https://github.com/alexc-hue/project-controls-reporting-engine),
+[recovery-scenario-planner](https://github.com/alexc-hue/recovery-scenario-planner).
+Two separate practice models apply the same methods to data center
+delivery, on synthetic data:
+[commissioning-readiness-gate](https://github.com/alexc-hue/commissioning-readiness-gate),
+[facility-status-digital-twin](https://github.com/alexc-hue/facility-status-digital-twin).
 
 ![Cumulative cost](assets/cumulative_cost.png)
 
@@ -79,12 +84,12 @@ alongside the charts: see [assets/report.md](assets/report.md).
 
 ## Screenshots
 
-**Budget creep** — cumulative approved cost impact, in the order changes
+**Budget creep:** cumulative approved cost impact, in the order changes
 were decided.
 
 ![Cumulative cost](assets/cumulative_cost.png)
 
-**Decision cycle time** — days to decide for resolved changes (green), days
+**Decision cycle time:** days to decide for resolved changes (green), days
 open for pending ones (amber, red if stale).
 
 ![Cycle time](assets/cycle_time.png)
