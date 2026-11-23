@@ -4,6 +4,27 @@ All notable changes to this project are recorded here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and version numbers
 follow [Semantic Versioning](https://semver.org/).
 
+## [1.2.2] - 2026-11-23
+
+Bug-fix release. The console report, `assets/report.md` and the charts are unchanged on the sample
+data.
+
+### Fixed
+
+- Status matching ignores case and surrounding whitespace. A hand-typed "pending" or " Approved"
+  used to drop out of every count (pending, stale, approved, cumulative impact) without a warning.
+  `load_change_log` and `add_cycle_and_aging` now write Pending, Approved and Rejected in their
+  usual form; any other status is only trimmed.
+- `cycle_days` and `days_open` are float columns (NaN where there is no value) instead of object
+  columns filled with `pd.NA`.
+- `money()` printed a small negative amount such as -0.4 as `-$0`. It now prints `$0`.
+- A docstring in `src/metrics.py` used a long dash; it now uses plain punctuation like the rest of
+  the repo.
+
+### Added
+
+- Tests for each fix above.
+
 ## [1.2.1] - 2026-11-12
 
 Maintenance release. The tool's output is unchanged.
@@ -57,6 +78,7 @@ Checks and tests only. The tool's output is unchanged.
 
 First tagged release, marking the state of the repo before this changelog started. Change log metrics: approval rate, decision cycle time, stale pending changes, and cumulative approved cost and schedule impact, with charts and a markdown report. Includes the fixes from code review, a pytest suite and CI.
 
+[1.2.2]: https://github.com/alexc-hue/change-control-register/compare/v1.2.1...v1.2.2
 [1.2.1]: https://github.com/alexc-hue/change-control-register/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/alexc-hue/change-control-register/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/alexc-hue/change-control-register/compare/v1.0.0...v1.1.0

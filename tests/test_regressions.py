@@ -1,7 +1,7 @@
-"""Regression tests for bugs fixed in commits 5e148b6 and 0bda9ab.
+"""Regression tests for bugs fixed in commits 5e148b6 and 0bda9ab, and in 1.2.2.
 
-Each test was confirmed to fail with its fix temporarily reverted before
-being committed.
+Each test was confirmed to fail with its fix temporarily reverted (or, for
+1.2.2, before the fix was written) before being committed.
 """
 
 from __future__ import annotations
@@ -11,7 +11,12 @@ import pytest
 
 import change_control
 from src.formatting import money
-from src.metrics import add_cycle_and_aging, summary_stats
+from src.metrics import (
+    add_cycle_and_aging,
+    cumulative_impact,
+    load_change_log,
+    summary_stats,
+)
 
 STATUS_DATE = "2026-02-01"
 
@@ -74,3 +79,45 @@ def test_markdown_report_says_n_a_when_nothing_is_decided(monkeypatch, tmp_path)
 def test_free_text_cannot_break_the_markdown_table():
     assert change_control._escape_md_cell("a|b\nc") == r"a\|b c"
     assert change_control._escape_md_cell(float("nan")) == ""
+
+
+# --- 1.2.2 -------------------------------------------------------------------
+
+def test_status_matching_ignores_case_and_whitespace():
+    """"pending" or " Approved" used to vanish from every count with no warning."""
+    changes = add_cycle_and_aging(
+        _changes(["pending", " Approved", "REJECTED ", "Pending"], [None, "2026-01-05", "2026-01-10", None]),
+        "2026-03-01",
+    )
+    stats = summary_stats(changes)
+    assert (stats["pending_count"], stats["approved_count"], stats["rejected_count"]) == (2, 1, 1)
+    assert stats["stale_pending_count"] == 2
+    assert list(changes["status"]) == ["Pending", "Approved", "Rejected", "Pending"]
+    assert list(cumulative_impact(changes)["change_id"]) == ["C2"]
+
+
+def test_load_change_log_tidies_status(tmp_path):
+    path = tmp_path / "log.csv"
+    path.write_text(
+        "change_id,date_raised,date_decided,status,cost_impact,schedule_impact_days\n"
+        "C1,2026-01-01,,  pending ,100,1\n"
+        "C2,2026-01-02,2026-01-04,approved,200,2\n"
+        "C3,2026-01-03,,On Hold,300,3\n",
+        encoding="utf-8",
+    )
+    assert list(load_change_log(str(path))["status"]) == ["Pending", "Approved", "On Hold"]
+
+
+def test_cycle_and_aging_columns_are_numeric_not_object():
+    """pd.NA made these object columns, so comparisons and sums went through slow
+    object paths that depend on pandas' NA rules."""
+    changes = add_cycle_and_aging(_changes(["Approved", "Pending"], ["2026-01-05", None]), STATUS_DATE)
+    assert changes["cycle_days"].dtype == "float64"
+    assert changes["days_open"].dtype == "float64"
+    assert changes["is_stale"].dtype == bool
+
+
+def test_money_does_not_print_minus_zero():
+    assert money(-0.4) == "$0"
+    assert money(-0.6) == "-$1"
+    assert money(0.4) == "$0"
